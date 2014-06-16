@@ -113,16 +113,16 @@ describe('chatterbox', function() {
       });
 
       it('should try to send a message upon clicking submit', function(){
-        sinon.spy(app, 'handleSubmit');
+        sinon.spy(app, 'send');
 
         $('#message').text('Why so many Mel Brooks quotes?');
 
         app.init();
 
         $('#send .submit').trigger('submit');
-        expect(app.handleSubmit.calledOnce).to.be.true;
+        expect(app.send.called).to.be.true;
 
-        app.handleSubmit.restore();
+        app.send.restore();
       });
     });
   });
