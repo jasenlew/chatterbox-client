@@ -2,7 +2,7 @@
 var App = function () {
   this.server = "https://api.parse.com/1/classes/chatterbox?";
   this.friends = {};
-  this.user;
+  this.user= window.location.search.substr(10);
   this.rooms = {};
 };
 
@@ -42,21 +42,37 @@ App.prototype.clearMessages = function () {
 };
 
 App.prototype.addMessage = function(message, roomname) {
-  var li = '<li class="message">';
-  // SAVE OBJECT ID AS ID
-  li += '<div class="username" id="' + message.username +'">' + message.username + '</div>';
-  li += '<div class="text">' + message.text + '</div>';
-  li += '</li>';
 
-  // ONLY SAVE NEW MESSAGES
-  this.rooms[roomname].find('ul.messages').append(li);
+  var element = $('li.message#'+message.objectId);
+// debugger;
+  if($('li.message#'+message.objectId).length < 1){
+    if(message.text !== ""){
+      var li = '<li class="message divider-horizontal" id="'+message.objectId+'">';
+      li += '<h3><div class="username" id="' + message.username +'">' + message.username + '</div></h3>';
+      li += '<div class="text">' + message.text + '</div>';
+      li += '</li>';
+    }
+    // ONLY SAVE NEW MESSAGES
+    this.rooms[roomname].find('ul.messages').append(li);
+  }
 };
 
 App.prototype.addRoom = function(roomname){
-    var li = '<li class="room" id="' + roomname + '">' + roomname + '</li>';
+    var li = '<li class="room" id="' + roomname + '">'+
+              '<div class="container"><div class="jumbotron">'+
+                '<h1 class="roomname">'+roomname+'</h1>'+
+                '<ul class="messages"></ul>'+
+                '<div class="form-horizontal">'+
+                  '<form class="form-inline" role="form">'+
+                  '<input type="text" class="form-control" id="messsage-text" placeholder="Keep it classy!">'+
+                  '<button id="send-message" class="btn btn-primary">Submit</button>'+
+                  '</form>'+
+                '</div>'+
+                '</div>'+
+              '</li>';
+
     $('ul.rooms').append(li);
     this.rooms[roomname] = $('li.room#'+roomname);
-    this.rooms[roomname].append('<ul class="messages"></ul>');
 };
 
 App.prototype.addFriend = function(username) {
@@ -69,16 +85,17 @@ App.prototype.populateChat = function(returnData){
     var message = returnData.results[i];
     //check to make sure its not an undefined roomname
     if(message.roomname){
-      if (!this.rooms[message.roomname]) {
-        this.addRoom(message.roomname);
+      var roomname = message.roomname.replace(/(<([^>]+)>)/ig,"");
+      if (!this.rooms[roomname]) {
+        this.addRoom(roomname);
       }
 
       this.addMessage(message, message.roomname);
 
-      console.log("User: " + message.username);
-      console.log("Message: " + message.text);
-      console.log("Roomname: " + message.roomname);
-      console.log("-------");
+      // console.log("User: " + message.username);
+      // console.log("Message: " + message.text);
+      // console.log("Roomname: " + message.roomname);
+      // console.log("-------");
 
     }
   }
